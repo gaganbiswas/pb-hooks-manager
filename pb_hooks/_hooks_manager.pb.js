@@ -20,7 +20,6 @@ routerAdd(
           child[fileName] = recurseFolder(folder + "/" + fileName);
           result.push(child);
         } else if (!IGNORE.includes(fileName)) {
-          // --- NEW LOGIC: Parse routes ---
           let routes = [];
           try {
             const content = toString($os.readFile(folder + "/" + fileName));
@@ -52,7 +51,7 @@ routerAdd(
   function (e) {
     if ($app.settings().meta.hideControls)
       throw BadRequestError(
-        'Read Only Mode. Switch off "Hide collection create and edit controls" in PocketBase superuser dashboard at /_/#/settings'
+        'Read Only Mode. Switch off "Hide collection create and edit controls" in PocketBase admin dashboard at /_/#/settings'
       );
 
     let path = e.queryParam("path");
@@ -60,7 +59,6 @@ routerAdd(
     if (path.includes("../"))
       throw BadRequestError("Can't escape out of pb_hooks folder");
 
-    //move/rename
     let newPath = $apis.requestInfo(e).data.path;
     if (newPath) {
       if (newPath.includes("../"))
@@ -91,7 +89,7 @@ routerAdd(
   function (e) {
     if ($app.settings().meta.hideControls)
       throw BadRequestError(
-        'Read Only Mode. Switch off "Hide collection create and edit controls" in PocketBase superuser dashboard at /_/#/settings'
+        'Read Only Mode. Switch off "Hide collection create and edit controls" in PocketBase admin dashboard at /_/#/settings'
       );
 
     let path = e.queryParam("path");
@@ -99,7 +97,6 @@ routerAdd(
     if (path.includes("../"))
       throw BadRequestError("Can't escape out of pb_hooks folder");
 
-    //move/rename
     let newPath = $apis.requestInfo(e).data.path;
     if (newPath) {
       if (newPath.includes("../"))
@@ -123,7 +120,7 @@ routerAdd(
   function (e) {
     if ($app.settings().meta.hideControls)
       throw BadRequestError(
-        'Read Only Mode. Switch off "Hide collection create and edit controls" in PocketBase superuser dashboard at /_/#/settings'
+        'Read Only Mode. Switch off "Hide collection create and edit controls" in PocketBase admin dashboard at /_/#/settings'
       );
 
     let path = e.queryParam("path");
