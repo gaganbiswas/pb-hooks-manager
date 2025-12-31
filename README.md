@@ -5,6 +5,8 @@ Compatible version: `v0.22.x` (In theory should work with lower versions as well
 
 _Note: For a similar hooks manager that is compatible with version `>=0.23.x` refer to https://github.com/deselected/pb-hooks-dash_
 
+<img width="1470" height="746" alt="ss" src="https://github.com/user-attachments/assets/2cde7291-183a-483a-8c2e-65b7af33b2e7" />
+
 ---
 
 ## Project Structure
