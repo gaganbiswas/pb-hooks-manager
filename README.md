@@ -1,4 +1,4 @@
-# 🗂️ PocketBase Hooks Manager
+# PocketBase Hooks Manager
 
 Simple and minimalist hooks manager for your pocketbase server.
 Compatible version: `v0.22.x` (In theory should work with lower versions as well)
@@ -7,7 +7,7 @@ _Note: For a similar hooks manager that is compatible with version `>=0.23.x` re
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 To use this tool, download and organise the files as follows:
 
