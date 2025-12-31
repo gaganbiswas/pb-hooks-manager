@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hooks Manager</title>
+    <link rel="stylesheet" href="hooks-manager/style.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <a class="logo logo-sm"
+            ><img
+              src="../_/images/logo.svg"
+              alt="PocketBase logo"
+              width="40"
+              height="40"
+          /></a>
+          <div class="header-actions">
+            <button onclick="createNewFile()">+ File</button>
+            <button onclick="createNewFolder()">+ Folder</button>
+          </div>
+        </div>
+        <div id="file-tree" class="tree"></div>
+      </aside>
+
+      <main class="main-editor">
+        <header class="editor-header">
+          <span id="current-path">no file selected</span>
+          <div class="editor-actions">
+            <button
+              id="delete-btn"
+              disabled
+              onclick="deleteItem()"
+              class="btn-danger"
+            >
+              Delete
+            </button>
+            <button
+              id="save-btn"
+              disabled
+              onclick="saveFile()"
+              class="btn-primary"
+            >
+              Saved
+            </button>
+          </div>
+        </header>
+
+        <div id="editor-wrapper">
+          <pre
+            id="highlight-layer"
+          ><code id="highlight-code" class="language-js"></code></pre>
+          <textarea
+            id="editor"
+            spellcheck="false"
+            oninput="updateEditor()"
+            onscroll="syncScroll()"
+          ></textarea>
+        </div>
+      </main>
+    </div>
+    <script src="hooks-manager/index.js"></script>
+  </body>
+</html>
