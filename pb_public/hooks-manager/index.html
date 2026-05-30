@@ -523,6 +523,7 @@
         deleteBtn.disabled = true;
         formatBtn.disabled = true;
         updateSaveButton();
+        renderTabs();
         const url = new URL(window.location);
         url.searchParams.delete("file");
         window.history.replaceState({}, "", url);
@@ -571,8 +572,26 @@
         activateTab(path);
       }
 
+      function beautify(code) {
+        return js_beautify(code, {
+          indent_size: 2,
+          space_in_empty_paren: true,
+          end_with_newline: true,
+        });
+      }
+
       async function saveTab(tab) {
-        const content = tab.doc.getValue();
+        // Auto-format before persisting so saved files stay tidy.
+        const content = beautify(tab.doc.getValue());
+        if (content !== tab.doc.getValue()) {
+          if (tab.path === activeTabPath) {
+            const cursor = cm.getCursor();
+            tab.doc.setValue(content);
+            cm.setCursor(cursor);
+          } else {
+            tab.doc.setValue(content);
+          }
+        }
         const res = await pbFetch(`/hooks-manager/file?path=${tab.path}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -624,11 +643,7 @@
       function formatCode() {
         const tab = getActiveTab();
         if (!tab || isBusy) return;
-        const formatted = js_beautify(tab.doc.getValue(), {
-          indent_size: 2,
-          space_in_empty_paren: true,
-          end_with_newline: true,
-        });
+        const formatted = beautify(tab.doc.getValue());
         if (formatted === tab.doc.getValue()) return;
         const cursor = cm.getCursor();
         cm.setValue(formatted);
