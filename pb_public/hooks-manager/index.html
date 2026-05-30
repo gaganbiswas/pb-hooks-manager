@@ -12,6 +12,7 @@
         --text-main: #111827;
         --text-muted: #6b7280;
         --danger: #dc2626;
+        --accent: #2563eb;
       }
 
       body,
@@ -31,6 +32,7 @@
 
       .sidebar {
         width: 260px;
+        min-width: 260px;
         background: var(--bg-sidebar);
         border-right: 1px solid var(--border-color);
         display: flex;
@@ -48,10 +50,36 @@
         font-size: 0.85rem;
         letter-spacing: 0.05em;
       }
+
+      .search-box {
+        padding: 0.6rem 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+      #search-input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--text-main);
+        outline: none;
+      }
+      #search-input:focus {
+        border-color: var(--accent);
+      }
+
       .tree {
         padding: 1rem;
         overflow-y: auto;
         font-size: 0.85rem;
+        flex: 1;
+      }
+      .tree .empty {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        padding: 0.5rem 0.6rem;
       }
 
       .folder-group {
@@ -83,12 +111,75 @@
         background: #f3f4f6;
         color: var(--text-main);
       }
+      .tree-item.active {
+        background: #f3f4f6;
+        color: var(--text-main);
+      }
 
       .main-editor {
         flex: 1;
         display: flex;
         flex-direction: column;
+        min-width: 0;
       }
+
+      /* Tab bar */
+      .tabs-bar {
+        display: flex;
+        align-items: stretch;
+        background: var(--bg-sidebar);
+        border-bottom: 1px solid var(--border-color);
+        overflow-x: auto;
+        min-height: 38px;
+      }
+      .tab {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 0.5rem 0 0.85rem;
+        border-right: 1px solid var(--border-color);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        white-space: nowrap;
+        max-width: 220px;
+        user-select: none;
+      }
+      .tab:hover {
+        background: #f3f4f6;
+      }
+      .tab.active {
+        background: #fff;
+        color: var(--text-main);
+        box-shadow: inset 0 -2px 0 var(--accent);
+      }
+      .tab-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .tab .dirty-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex-shrink: 0;
+      }
+      .tab-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        line-height: 1;
+        color: var(--text-muted);
+      }
+      .tab-close:hover {
+        background: #e5e7eb;
+        color: var(--text-main);
+      }
+
       .editor-header {
         height: 56px;
         display: flex;
@@ -102,6 +193,10 @@
         font-size: 0.75rem;
         color: var(--text-muted);
       }
+      .editor-actions {
+        display: flex;
+        gap: 8px;
+      }
 
       #editor-wrapper {
         position: relative;
@@ -109,10 +204,11 @@
         overflow: hidden;
         background: #fff;
       }
-
-      pre[class*="language-"] {
-        background: #fff !important;
-        margin: 0 !important;
+      .CodeMirror {
+        height: 100% !important;
+        font-family: "Fira Code", "SFMono-Regular", Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.6;
       }
 
       button {
@@ -147,6 +243,16 @@
         opacity: 0.3;
         cursor: not-allowed;
       }
+      #save-btn:disabled {
+        background: #f3f4f6;
+        color: #9ca3af;
+        border: 1px solid var(--border-color);
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+      #save-btn {
+        transition: all 0.2s ease;
+      }
 
       .route-list {
         margin-left: 1.5rem;
@@ -154,7 +260,6 @@
         border-left: 1px dashed var(--border-color);
         padding-left: 0.5rem;
       }
-
       .route-entry {
         font-size: 0.7rem;
         font-family: monospace;
@@ -164,7 +269,6 @@
         align-items: center;
         color: var(--text-muted);
       }
-
       .method {
         font-weight: bold;
         font-size: 0.6rem;
@@ -172,7 +276,6 @@
         border-radius: 3px;
         text-transform: uppercase;
       }
-
       .method.get {
         background: #dcfce7;
         color: #166534;
@@ -189,74 +292,57 @@
         background: #fee2e2;
         color: #991b1b;
       }
-
       .route-entry .path {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
-      /* Unified styling to ensure perfect cursor alignment */
-      #editor,
-      #highlight-layer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 20px; /* Precise padding */
-        font-family: "Fira Code", "SFMono-Regular", Consolas, monospace;
-        font-size: 13px; /* Slightly larger for better readability */
-        line-height: 1.6; /* Constant unitless line-height */
-        border: none;
-        white-space: pre;
-        overflow: auto;
-        tab-size: 4;
-        box-sizing: border-box;
+      /* Saving loader overlay - blocks all interaction (incl. switching links) */
+      #loader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(1px);
+        align-items: center;
+        justify-content: center;
       }
-
-      #editor {
-        color: transparent;
-        background: transparent;
-        caret-color: #111827; /* Dark cursor */
-        z-index: 2;
-        resize: none;
-        outline: none;
-        /* Prevents the text from being slightly offset in some browsers */
-        -webkit-text-fill-color: transparent;
-      }
-
-      #highlight-layer {
-        z-index: 1;
-        pointer-events: none;
+      #loader .loader-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
         background: #fff;
-        border: none;
-      }
-
-      .tree-item.active {
-        background: #f3f4f6;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 12px 18px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        font-size: 0.8rem;
         color: var(--text-main);
       }
-
-      #save-btn:disabled {
-        background: #f3f4f6;
-        color: #9ca3af;
-        border: 1px solid var(--border-color);
-        cursor: not-allowed;
-        opacity: 0.7;
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--border-color);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
       }
-
-      #save-btn {
-        transition: all 0.2s ease;
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
       }
     </style>
     <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify.min.js"></script>
   </head>
   <body>
     <div class="app-container">
@@ -274,13 +360,27 @@
             <button onclick="createNewFolder()">+ Folder</button>
           </div>
         </div>
+        <div class="search-box">
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Search route or file…"
+            autocomplete="off"
+            spellcheck="false"
+            oninput="onSearch()"
+          />
+        </div>
         <div id="file-tree" class="tree"></div>
       </aside>
 
       <main class="main-editor">
+        <div id="tabs-bar" class="tabs-bar"></div>
         <header class="editor-header">
           <span id="current-path">no file selected</span>
           <div class="editor-actions">
+            <button id="format-btn" disabled onclick="formatCode()">
+              Format
+            </button>
             <button
               id="delete-btn"
               disabled
@@ -292,7 +392,7 @@
             <button
               id="save-btn"
               disabled
-              onclick="saveFile()"
+              onclick="saveCurrent()"
               class="btn-primary"
             >
               Saved
@@ -300,19 +400,17 @@
           </div>
         </header>
 
-        <div id="editor-wrapper">
-          <pre
-            id="highlight-layer"
-          ><code id="highlight-code" class="language-js"></code></pre>
-          <textarea
-            id="editor"
-            spellcheck="false"
-            oninput="updateEditor()"
-            onscroll="syncScroll()"
-          ></textarea>
-        </div>
+        <div id="editor-wrapper"></div>
       </main>
     </div>
+
+    <div id="loader">
+      <div class="loader-card">
+        <div class="spinner"></div>
+        <span id="loader-text">Saving…</span>
+      </div>
+    </div>
+
     <script>
       // piggyback admin token from /_ dashboard
       const SUPERUSER_TOKEN = JSON.parse(
@@ -327,15 +425,16 @@
         window.location.href = window.location.origin + "/_/#/login";
       }
 
-      let currentFilePath = "";
-      let lastSavedContent = "";
-      const editor = document.getElementById("editor");
-      const codeLayer = document.getElementById("highlight-code");
-      const saveBtn = document.getElementById("save-btn");
+      // ---- State ----------------------------------------------------------
+      let treeData = []; // last fetched folder tree
+      let tabs = []; // [{ path, savedContent, doc }]
+      let activeTabPath = null;
+      let isBusy = false; // true while a save/network op is in flight
 
-      /**
-       * Global Fetch Wrapper
-       */
+      let cm; // CodeMirror instance
+      let saveBtn, formatBtn, deleteBtn, pathLabel;
+
+      // ---- Network --------------------------------------------------------
       async function pbFetch(url, options = {}) {
         options.headers = {
           ...options.headers,
@@ -347,112 +446,195 @@
         return res;
       }
 
-      function updateEditor() {
-        let content = editor.value;
+      // ---- Loader (blocks switching links while saving) -------------------
+      function showLoader(text = "Saving…") {
+        isBusy = true;
+        document.getElementById("loader-text").innerText = text;
+        document.getElementById("loader").style.display = "flex";
+      }
+      function hideLoader() {
+        isBusy = false;
+        document.getElementById("loader").style.display = "none";
+      }
 
-        if (content === lastSavedContent) {
+      // ---- Tab helpers ----------------------------------------------------
+      function getTab(path) {
+        return tabs.find((t) => t.path === path) || null;
+      }
+      function getActiveTab() {
+        return getTab(activeTabPath);
+      }
+      function isDirty(tab) {
+        return tab && tab.doc.getValue() !== tab.savedContent;
+      }
+
+      function updateSaveButton() {
+        const tab = getActiveTab();
+        if (!tab) {
           saveBtn.disabled = true;
           saveBtn.innerText = "Saved";
-        } else {
+          return;
+        }
+        if (isDirty(tab)) {
           saveBtn.disabled = false;
-          saveBtn.innerText = "Save Changes";
+          saveBtn.innerText = "Save";
+        } else {
+          saveBtn.disabled = true;
+          saveBtn.innerText = "Saved";
         }
-
-        if (content[content.length - 1] == "\n") content += " ";
-        codeLayer.textContent = content;
-        Prism.highlightElement(codeLayer);
       }
 
-      function syncScroll() {
-        const pre = document.getElementById("highlight-layer");
-        pre.scrollTop = editor.scrollTop;
-        pre.scrollLeft = editor.scrollLeft;
-      }
+      function renderTabs() {
+        const bar = document.getElementById("tabs-bar");
+        bar.innerHTML = "";
+        tabs.forEach((tab) => {
+          const el = document.createElement("div");
+          el.className = "tab" + (tab.path === activeTabPath ? " active" : "");
+          el.title = tab.path;
+          el.onclick = () => activateTab(tab.path);
 
-      /**
-       * Key Listeners: Tab and Ctrl+S (Auto-brackets removed)
-       */
-      editor.addEventListener("keydown", function (e) {
-        const start = this.selectionStart;
-        const end = this.selectionEnd;
+          const name = document.createElement("span");
+          name.className = "tab-name";
+          name.innerText = tab.path.split("/").pop();
+          el.appendChild(name);
 
-        // Handle Tab key
-        if (e.key === "Tab") {
-          e.preventDefault();
-          this.value =
-            this.value.substring(0, start) + "\t" + this.value.substring(end);
-          this.selectionStart = this.selectionEnd = start + 1;
-          updateEditor();
-        }
-
-        // Handle Ctrl+S or Cmd+S
-        if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-          e.preventDefault();
-          saveFile();
-        }
-      });
-
-      async function fetchTree() {
-        const res = await pbFetch(`/hooks-manager/folder`);
-        if (!res.ok) return;
-        const data = await res.json();
-        renderTree(data, document.getElementById("file-tree"));
-      }
-
-      /**
-       * Load File with Auto-Save protection
-       */
-      async function loadFile(path, skipPush = false) {
-        // Check if current file has unsaved changes before switching
-        if (currentFilePath && editor.value !== lastSavedContent) {
-          saveBtn.innerText = "Saving...";
-          await saveFile(true);
-        }
-
-        const res = await pbFetch(`/hooks-manager/file?path=${path}`);
-        if (!res.ok) return;
-
-        const content = await res.text();
-        currentFilePath = path;
-        lastSavedContent = content;
-
-        document.getElementById("current-path").innerText = path;
-        editor.value = content;
-        document.getElementById("delete-btn").disabled = false;
-
-        if (!skipPush) {
-          const url = new URL(window.location);
-          url.searchParams.set("file", path);
-          window.history.pushState({}, "", url);
-        }
-
-        await fetchTree();
-        updateEditor();
-      }
-
-      /**
-       * Save File logic
-       * @param {boolean} silent - If true, skips the tree refresh to speed up navigation
-       */
-      async function saveFile(silent = false) {
-        if (!currentFilePath || editor.value === lastSavedContent) return;
-
-        saveBtn.innerText = "Saving...";
-
-        const res = await pbFetch(
-          `/hooks-manager/file?path=${currentFilePath}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents: editor.value }),
+          if (isDirty(tab)) {
+            const dot = document.createElement("span");
+            dot.className = "dirty-dot";
+            el.appendChild(dot);
           }
-        );
 
-        if (res.ok) {
-          lastSavedContent = editor.value;
-          updateEditor();
-          if (!silent) await fetchTree();
+          const close = document.createElement("span");
+          close.className = "tab-close";
+          close.title = "Close (autosaves changes)";
+          close.innerHTML = "&times;";
+          close.onclick = (ev) => closeTab(tab.path, ev);
+          el.appendChild(close);
+
+          bar.appendChild(el);
+        });
+      }
+
+      function clearEditor() {
+        activeTabPath = null;
+        cm.swapDoc(CodeMirror.Doc("", "javascript"));
+        cm.setOption("readOnly", true);
+        pathLabel.innerText = "no file selected";
+        deleteBtn.disabled = true;
+        formatBtn.disabled = true;
+        updateSaveButton();
+        const url = new URL(window.location);
+        url.searchParams.delete("file");
+        window.history.replaceState({}, "", url);
+      }
+
+      function activateTab(path) {
+        if (isBusy) return;
+        const tab = getTab(path);
+        if (!tab) return;
+        activeTabPath = path;
+        cm.swapDoc(tab.doc);
+        cm.setOption("readOnly", false);
+        pathLabel.innerText = path;
+        deleteBtn.disabled = false;
+        formatBtn.disabled = false;
+        updateSaveButton();
+        renderTabs();
+        renderCurrentTree();
+
+        const url = new URL(window.location);
+        url.searchParams.set("file", path);
+        window.history.replaceState({}, "", url);
+        cm.focus();
+      }
+
+      // ---- File operations ------------------------------------------------
+      async function openFile(path) {
+        if (isBusy) return;
+        const existing = getTab(path);
+        if (existing) {
+          activateTab(path);
+          return;
         }
+
+        showLoader("Loading…");
+        const res = await pbFetch(`/hooks-manager/file?path=${path}`);
+        if (!res.ok) {
+          hideLoader();
+          return;
+        }
+        const content = await res.text();
+        hideLoader();
+
+        const doc = CodeMirror.Doc(content, "javascript");
+        tabs.push({ path, savedContent: content, doc });
+        activateTab(path);
+      }
+
+      async function saveTab(tab) {
+        const content = tab.doc.getValue();
+        const res = await pbFetch(`/hooks-manager/file?path=${tab.path}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: content }),
+        });
+        if (res.ok) tab.savedContent = content;
+        return res.ok;
+      }
+
+      async function saveCurrent() {
+        const tab = getActiveTab();
+        if (!tab || !isDirty(tab) || isBusy) return;
+
+        showLoader("Saving…");
+        await saveTab(tab);
+        await fetchTree(); // refresh parsed routes in the sidebar
+        hideLoader();
+
+        updateSaveButton();
+        renderTabs();
+      }
+
+      // Autosave-on-close: closing a tab persists its changes first.
+      async function closeTab(path, ev) {
+        if (ev) ev.stopPropagation();
+        if (isBusy) return;
+        const tab = getTab(path);
+        if (!tab) return;
+
+        if (isDirty(tab)) {
+          showLoader("Saving…");
+          await saveTab(tab);
+          await fetchTree();
+          hideLoader();
+        }
+
+        const idx = tabs.indexOf(tab);
+        tabs.splice(idx, 1);
+
+        if (activeTabPath === path) {
+          const next = tabs[idx] || tabs[idx - 1] || null;
+          if (next) activateTab(next.path);
+          else clearEditor();
+        } else {
+          renderTabs();
+        }
+      }
+
+      function formatCode() {
+        const tab = getActiveTab();
+        if (!tab || isBusy) return;
+        const formatted = js_beautify(tab.doc.getValue(), {
+          indent_size: 2,
+          space_in_empty_paren: true,
+          end_with_newline: true,
+        });
+        if (formatted === tab.doc.getValue()) return;
+        const cursor = cm.getCursor();
+        cm.setValue(formatted);
+        cm.setCursor(cursor);
+        updateSaveButton();
+        renderTabs();
       }
 
       async function createNewFile() {
@@ -462,45 +644,103 @@
 
         const initialContent = `routerAdd("GET", "/api/${
           name.split(".")[0]
-        }", (e) => {\n\treturn e.json(200, { "message": "hello" });\n});`;
+        }", (e) => {\n  return e.json(200, { "message": "hello" });\n});\n`;
 
+        showLoader("Creating…");
         await pbFetch(`/hooks-manager/file?path=${name}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ contents: initialContent }),
         });
-        fetchTree();
+        await fetchTree();
+        hideLoader();
+        openFile(name);
       }
 
       async function createNewFolder() {
         const name = prompt("Folder name:");
-        if (name) {
-          await pbFetch(`/hooks-manager/folder?path=${name}`, {
-            method: "PUT",
-          });
-          fetchTree();
-        }
+        if (!name) return;
+        showLoader("Creating…");
+        await pbFetch(`/hooks-manager/folder?path=${name}`, { method: "PUT" });
+        await fetchTree();
+        hideLoader();
       }
 
       async function deleteItem(path) {
-        const target = path || currentFilePath;
-        if (!target || !confirm(`Delete ${target}?`)) return;
+        const target = path || activeTabPath;
+        if (!target || isBusy || !confirm(`Delete ${target}?`)) return;
 
+        showLoader("Deleting…");
         await pbFetch(`/hooks-manager/file?path=${target}`, {
           method: "DELETE",
         });
+        await fetchTree();
+        hideLoader();
 
-        if (target === currentFilePath) {
-          // Reset editor if current file is deleted
-          currentFilePath = "";
-          lastSavedContent = "";
-          editor.value = "";
-          const url = new URL(window.location);
-          url.searchParams.delete("file");
-          window.history.pushState({}, "", url);
-          updateEditor();
+        // Drop any open tab pointing at the deleted path (no autosave - it's gone).
+        const tab = getTab(target);
+        if (tab) {
+          const idx = tabs.indexOf(tab);
+          tabs.splice(idx, 1);
+          if (activeTabPath === target) {
+            const next = tabs[idx] || tabs[idx - 1] || null;
+            if (next) activateTab(next.path);
+            else clearEditor();
+          }
         }
-        fetchTree();
+        renderTabs();
+      }
+
+      // ---- Tree + search --------------------------------------------------
+      async function fetchTree() {
+        const res = await pbFetch(`/hooks-manager/folder`);
+        if (!res.ok) return;
+        treeData = await res.json();
+        renderCurrentTree();
+      }
+
+      // Keep files whose name OR any route (method/path) matches the query.
+      // Keep folders that match by name or that contain a matching descendant.
+      function filterTree(data, q) {
+        const result = [];
+        for (const item of data) {
+          if (typeof item === "object" && !item.type) {
+            const name = Object.keys(item)[0];
+            const children = filterTree(item[name], q);
+            if (name.toLowerCase().includes(q) || children.length) {
+              const folder = {};
+              folder[name] = name.toLowerCase().includes(q)
+                ? item[name]
+                : children;
+              result.push(folder);
+            }
+          } else {
+            const nameMatch = item.name.toLowerCase().includes(q);
+            const routeMatch = (item.routes || []).some(
+              (r) =>
+                r.path.toLowerCase().includes(q) ||
+                r.method.toLowerCase().includes(q)
+            );
+            if (nameMatch || routeMatch) result.push(item);
+          }
+        }
+        return result;
+      }
+
+      function onSearch() {
+        renderCurrentTree();
+      }
+
+      function renderCurrentTree() {
+        const q = document.getElementById("search-input").value.trim().toLowerCase();
+        const data = q ? filterTree(treeData, q) : treeData;
+        const container = document.getElementById("file-tree");
+        renderTree(data, container);
+        if (data.length === 0) {
+          container.innerHTML = `<div class="empty">${
+            q ? "No matches" : "No hooks yet"
+          }</div>`;
+        }
       }
 
       function renderTree(data, container, parentPath = "") {
@@ -527,7 +767,7 @@
           } else {
             // File
             const full = parentPath ? `${parentPath}/${item.name}` : item.name;
-            const activeClass = currentFilePath === full ? "active" : "";
+            const activeClass = activeTabPath === full ? "active" : "";
 
             let routesHtml = (item.routes || [])
               .map(
@@ -536,13 +776,13 @@
                     <span class="method ${r.method.toLowerCase()}">${
                   r.method
                 }</span>
-                    <span>${r.path}</span>
+                    <span class="path">${r.path}</span>
                 </div>`
               )
               .join("");
 
             el.innerHTML = `
-                <div class="tree-item ${activeClass}" onclick="loadFile('${full}')"><svg width='12' height='12' xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
+                <div class="tree-item ${activeClass}" onclick="openFile('${full}')"><svg width='12' height='12' xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 1H3.4A1.4 1.4 0 0 0 2 2.4v11.2A1.4 1.4 0 0 0 3.4 15h9.2a1.4 1.4 0 0 0 1.4-1.4V5m-4-4 4 4m-4-4v4h4"/>
 </svg> ${item.name}</div>
                 <div class="route-list">${routesHtml}</div>`;
@@ -551,10 +791,45 @@
         });
       }
 
+      // ---- Boot -----------------------------------------------------------
       window.onload = async () => {
+        saveBtn = document.getElementById("save-btn");
+        formatBtn = document.getElementById("format-btn");
+        deleteBtn = document.getElementById("delete-btn");
+        pathLabel = document.getElementById("current-path");
+
+        cm = CodeMirror(document.getElementById("editor-wrapper"), {
+          value: "",
+          mode: "javascript",
+          lineNumbers: true,
+          indentUnit: 2,
+          tabSize: 2,
+          indentWithTabs: false,
+          matchBrackets: true,
+          readOnly: true,
+          extraKeys: {
+            "Cmd-S": () => saveCurrent(),
+            "Ctrl-S": () => saveCurrent(),
+            "Shift-Alt-F": () => formatCode(),
+          },
+        });
+
+        cm.on("change", () => {
+          updateSaveButton();
+          renderTabs();
+        });
+
+        // Warn on hard navigation away with unsaved work.
+        window.addEventListener("beforeunload", (e) => {
+          if (tabs.some((t) => isDirty(t))) {
+            e.preventDefault();
+            e.returnValue = "";
+          }
+        });
+
         await fetchTree();
         const file = new URLSearchParams(window.location.search).get("file");
-        if (file) loadFile(file, true);
+        if (file) openFile(file);
       };
     </script>
   </body>
