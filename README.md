@@ -21,12 +21,6 @@ your-project/
 └── pocketbase (executable)
 ```
 
-## Future works
-
-- Integrated route tester.
-- Individual editor for each route inside a `.pb.js` file.
-- TBA
-
 ## Thanks
 
 This project builds on the excellent work from https://github.com/deselected/pb-hooks-dash. While not a traditional fork, it uses the original repository as its base.
